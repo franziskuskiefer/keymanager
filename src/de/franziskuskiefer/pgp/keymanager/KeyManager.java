@@ -14,6 +14,8 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -24,11 +26,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import de.franziskuskiefer.pgp.keymanager.model.KeyPair;
 import de.franziskuskiefer.pgp.keymanager.model.KeyPairs;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
+import de.franziskuskiefer.pgp.keymanager.model.Model;
 
 public class KeyManager {
 	private Binding website;
@@ -37,9 +35,10 @@ public class KeyManager {
 	protected Shell shell;
 	private String chosenDirectory;
 	private Table table;
-	private KeyPairs keys = new KeyPairs();
+	private KeyPairs keys;
 	private TableViewer tableViewer;
 	private TableColumn tblclmnWebsite;
+	private Model model;
 
 	/**
 	 * Launch the application.
@@ -59,6 +58,12 @@ public class KeyManager {
 		});
 	}
 
+	public KeyManager() {
+		// create model
+		model = new Model();
+		keys = model.getKeys();
+	}
+	
 	/**
 	 * Open the window.
 	 */
@@ -79,7 +84,7 @@ public class KeyManager {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(800, 600);
+		shell.setSize(400, 597);
 		shell.setText("SWT Application");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
@@ -133,18 +138,14 @@ public class KeyManager {
 		
 		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		tblclmnWebsite = tableViewerColumn.getColumn();
-		tblclmnWebsite.setWidth(212);
+		tblclmnWebsite.setWidth(276);
 		tblclmnWebsite.setText("Website");
 		
 		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnPublicKey = tableViewerColumn_2.getColumn();
-		tblclmnPublicKey.setWidth(185);
-		tblclmnPublicKey.setText("Public Key");
+		TableColumn tblclmnKeyID = tableViewerColumn_2.getColumn();
+		tblclmnKeyID.setWidth(100);
+		tblclmnKeyID.setText("KeyID");
 		
-		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnKeyid = tableViewerColumn_1.getColumn();
-		tblclmnKeyid.setWidth(100);
-		tblclmnKeyid.setText("KeyID");
 		m_bindingContext = initDataBindings();
 	}
 	protected DataBindingContext initDataBindings() {
@@ -155,7 +156,7 @@ public class KeyManager {
 		//
 		IObservableMap[] observeMaps = PojoObservables.observeMaps(
 					setContentProvider.getKnownElements(), KeyPair.class,
-					new String[] { "website", "keyID", "publicKey" });
+					new String[] { "website", "keyID"});
 		tableViewer.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
 		//
 		WritableSet writableSet = new WritableSet(keys.getKeyPairs(), KeyPair.class);

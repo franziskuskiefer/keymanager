@@ -1,19 +1,25 @@
 package de.franziskuskiefer.pgp.keymanager.model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class KeyPair extends AbstractModelObject{
 
-	private String website = "google.com";
-	
+	@XmlElement
+	private String website = "";
 	private String keyID = "";
-	private String publicKey = "";
+	private String publicKeyFile = "";
+	private String privateKeyFile = "";
 
 	public KeyPair() {
 	}
 
-	public KeyPair(String hp, String id, String pub) {
+	public KeyPair(String hp, String id, String pub, String priv) {
 		website = hp;
 		keyID = id;
-		publicKey = pub;
+		publicKeyFile = pub;
+		privateKeyFile = priv;
 	}
 	
 	public String getWebsite() {
@@ -35,14 +41,24 @@ public class KeyPair extends AbstractModelObject{
 		keyID = id;
 		firePropertyChange("keyID", oldValue, keyID);
 	}
-	
-	public String getPublicKey() {
-		return publicKey;
+
+	public String getPrivateKeyFile() {
+		return privateKeyFile;
 	}
-	
-	public void setPublicKey(String pk) {
-		String oldValue = publicKey;
-		publicKey = pk;
-		firePropertyChange("publicKey", oldValue, publicKey);
+
+	public void setPrivateKeyFile(String priv) {
+		String oldValue = privateKeyFile;
+		privateKeyFile = priv;
+		firePropertyChange("privateKeyFile", oldValue, privateKeyFile);
+	}
+
+	public String getPublicKeyFile() {
+		return publicKeyFile;
+	}
+
+	public void setPublicKeyFile(String pub) {
+		String oldValue = publicKeyFile;
+		publicKeyFile = pub;
+		firePropertyChange("publicKeyFile", oldValue, publicKeyFile);
 	}
 }
