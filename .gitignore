@@ -1,1 +1,4 @@
 bin/
+lib/bcpg-jdk15on-147/
+lib/bcpkix-jdk15on-147/
+lib/bcprov-jdk15on-147/
