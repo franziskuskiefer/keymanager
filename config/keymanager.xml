@@ -2,27 +2,27 @@
 <keyPairs>
     <keyPairs>
         <website>google.com</website>
-        <keyID>0xABCDEF</keyID>
+        <mail>bla@gmail.com</mail>
     </keyPairs>
     <keyPairs>
         <website>facebook.com</website>
-        <keyID>0x7654JH</keyID>
+        <mail>blub@yahoo.com</mail>
     </keyPairs>
     <keyPairs>
         <website>sdf.com</website>
-        <keyID>0x87654EF</keyID>
+        <mail>0x87654EF</mail>
     </keyPairs>
     <keyPairs>
         <website>zrhb.com</website>
-        <keyID>0x123EF</keyID>
+        <mail>0x123EF</mail>
     </keyPairs>
     <keyPairs>
         <website>poektg.com</website>
-        <keyID>0xABGWEEF</keyID>
+        <mail>0xABGWEEF</mail>
     </keyPairs>
     <keyPairs>
         <website>ijrv.com</website>
-        <keyID>0xF3FAA202</keyID>
+        <mail>0xF3FAA202</mail>
     </keyPairs>
     <keyRing>/home/franziskus/workspace/PGP\ KeyManager/test/keys/keyring</keyRing>
 </keyPairs>

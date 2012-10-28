@@ -151,9 +151,9 @@ public class KeyManager {
 		tblclmnWebsite.setText("Website");
 		
 		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnKeyID = tableViewerColumn_2.getColumn();
-		tblclmnKeyID.setWidth(100);
-		tblclmnKeyID.setText("KeyID");
+		TableColumn tblclmnMail = tableViewerColumn_2.getColumn();
+		tblclmnMail.setWidth(100);
+		tblclmnMail.setText("Mail");
 		
 		m_bindingContext = initDataBindings();
 	}
@@ -165,7 +165,7 @@ public class KeyManager {
 		//
 		IObservableMap[] observeMaps = PojoObservables.observeMaps(
 					setContentProvider.getKnownElements(), KeyPair.class,
-					new String[] { "website", "keyID"});
+					new String[] { "website", "mail"});
 		tableViewer.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
 		//
 		WritableSet writableSet = new WritableSet(keys.getKeyPairs(), KeyPair.class);

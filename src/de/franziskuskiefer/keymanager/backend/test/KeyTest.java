@@ -1,5 +1,6 @@
 package de.franziskuskiefer.keymanager.backend.test;
 
+import java.io.File;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -25,8 +26,32 @@ public class KeyTest {
 
 	@Test
 	public void testCreating() {
-		manager.openKeyStore("test/keys/keystore.ks");
+		// delete keystore
+		File f = new File("test/keys/keystore.ks");
+		if (f.exists())
+			f.delete();
+		// test
+		manager.openKeyStore("test/keys/keystore.ks", "keyStorePassword");
 		manager.generateKey("My Name", "me@mail.de");
+		manager.generateKey("My Second Name", "another@mail-address.de");
+	}
+	
+	@Test
+	public void testCreatingErrors() {
+		// delete keystore
+		File f = new File("test/keys/keystore.ks");
+		if (f.exists())
+			f.delete();
+		// test
+		manager.openKeyStore("test/keys/keystore.ks", "keyStorePassword");
+		manager.generateKey("My Name", "me@mail.de");
+		try {
+			manager.generateKey("My Name", "me@mail.de");
+			assert(false);
+		} catch (IllegalArgumentException e){
+			System.out.println(e.getLocalizedMessage());
+			assert(true);
+		}
 	}
 
 }

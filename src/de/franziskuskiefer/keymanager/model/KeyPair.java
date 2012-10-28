@@ -8,14 +8,14 @@ public class KeyPair extends AbstractModelObject{
 
 	@XmlElement
 	private String website = "";
-	private String keyID = "";
+	private String mail = "";
 
 	public KeyPair() {
 	}
 
-	public KeyPair(String hp, String id) {
+	public KeyPair(String hp, String m) {
 		website = hp;
-		keyID = id;
+		mail = m;
 	}
 	
 	public String getWebsite() {
@@ -28,14 +28,14 @@ public class KeyPair extends AbstractModelObject{
 		firePropertyChange("website", oldValue, website);
 	}
 	
-	public String getKeyID() {
-		return keyID;
+	public String getMail() {
+		return mail;
 	}
-	
-	public void setKeyID(String id) {
-		String oldValue = keyID;
-		keyID = id;
-		firePropertyChange("keyID", oldValue, keyID);
+
+	public void setMail(String m) {
+		String oldValue = mail;
+		mail = m;
+		firePropertyChange("mail", oldValue, mail);
 	}
 
 }

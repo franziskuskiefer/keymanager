@@ -9,11 +9,13 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -33,45 +35,58 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class KeyManagerBackend {
 
-	private static final ProtectionParameter EMPTY_KEYSTORE_ENTRY_PASSWORD = new KeyStore.PasswordProtection(new char[0]);
+	private ProtectionParameter passwordParameter;
 	private KeyStore ks;
 	private File f;
+	private String password;
 	
 	public KeyManagerBackend() throws Exception {
 		Security.addProvider(new BouncyCastleProvider());
-//		createKeyStore(new char[0]);
-//		KeyPair k = createKeyPair();
-//		X509Certificate cert = createCert("ABC def", k, "me@blub.de");
-//		addKeyToKeyStore(k, "me@blub.de", cert);
-//		saveKeyStore("test/keys/keystore.ks", new char[0]);
-		
-//		loadKeyStore(new char[0], "test/keys/keystore.ks");
-//		X509Certificate cert = createCert("ABC def", k, "me3@blub.de");
-//		addKeyToKeyStore(k, "me3@blub.de", cert);
-//		saveKeyStore("test/keys/keystore.ks", new char[0]);
 	}
 	
-	public void openKeyStore(String file){
+	public void openKeyStore(String file, String pwd){
 		f = new File(file);
+		password = pwd;
+		passwordParameter = new KeyStore.PasswordProtection(password.toCharArray());
 		if (f.exists()){
-			loadKeyStore(new char[0], f);
+			loadKeyStore();
 		} else {
-			createKeyStore(new char[0]);
+			createKeyStore();
 		}
 	}
 	
-	public void generateKey(String id, String mail){
-		KeyPair k = createKeyPair();
-		X509Certificate cert = createCert(id, k, mail);
-		addKeyToKeyStore(k, mail, cert);
-		saveKeyStore(f, new char[0]);
+	public void generateKey(String id, String mail) {
+		if (getKeyPair(mail) == null) {
+			KeyPair k = createKeyPair();
+			X509Certificate cert = createCert(id, k, mail);
+			addKeyToKeyStore(k, mail, cert);
+			saveKeyStore();
+		} else {
+			throw new IllegalArgumentException("Key with identifier "+mail+" already exists.");
+		}
 	}
 	
-	private void saveKeyStore(File file, char[] pwd) {
+	public KeyPair getKey(String mail) {
+		return getKeyPair(mail);
+	}
+	
+	private KeyPair getKeyPair(String mail) {
+		try {
+			KeyStore.PrivateKeyEntry entry = (PrivateKeyEntry) ks.getEntry(mail, passwordParameter);
+			if (entry != null)
+				return new KeyPair(entry.getCertificate().getPublicKey(), entry.getPrivateKey());
+		} catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private void saveKeyStore() {
 		FileOutputStream fos = null;
 		try {
-			fos = new FileOutputStream(file);
-			ks.store(fos, pwd);
+			fos = new FileOutputStream(f);
+			ks.store(fos, password.toCharArray());
 			fos.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -96,10 +111,10 @@ public class KeyManagerBackend {
 		}
 	}
 
-	protected void createKeyStore(char[] password) {
+	protected void createKeyStore() {
 		try {
 			ks = KeyStore.getInstance(KeyStore.getDefaultType());
-			ks.load(null, password);
+			ks.load(null, password.toCharArray());
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -115,10 +130,10 @@ public class KeyManagerBackend {
 		}
 	}
 	
-	private void loadKeyStore(char[] password, File file) {
+	private void loadKeyStore() {
 		try {
 			ks = KeyStore.getInstance(KeyStore.getDefaultType());
-			ks.load(new FileInputStream(file), password);
+			ks.load(new FileInputStream(f), password.toCharArray());
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,10 +152,10 @@ public class KeyManagerBackend {
 		}
 	}
 	
-	private void addKeyToKeyStore(KeyPair k, String id, X509Certificate cert) {
+	private void addKeyToKeyStore(KeyPair k, String mail, X509Certificate cert) {
 		KeyStore.PrivateKeyEntry skEntry = new KeyStore.PrivateKeyEntry(k.getPrivate(), new Certificate[]{cert});
 		try {
-			ks.setEntry(id, skEntry, EMPTY_KEYSTORE_ENTRY_PASSWORD);
+			ks.setEntry(mail, skEntry, passwordParameter);
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
