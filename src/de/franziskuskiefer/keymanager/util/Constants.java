@@ -1,4 +1,4 @@
-package de.franziskuskiefer.pgp.keymanager.util;
+package de.franziskuskiefer.keymanager.util;
 
 public interface Constants {
 

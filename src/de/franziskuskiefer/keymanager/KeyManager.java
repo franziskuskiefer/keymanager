@@ -1,4 +1,4 @@
-package de.franziskuskiefer.pgp.keymanager;
+package de.franziskuskiefer.keymanager;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import de.franziskuskiefer.pgp.keymanager.model.KeyPair;
-import de.franziskuskiefer.pgp.keymanager.model.KeyPairs;
-import de.franziskuskiefer.pgp.keymanager.model.Model;
+import de.franziskuskiefer.keymanager.model.KeyPair;
+import de.franziskuskiefer.keymanager.model.KeyPairs;
+import de.franziskuskiefer.keymanager.model.Model;
 
 public class KeyManager {
 	private Binding website;
@@ -127,6 +127,15 @@ public class KeyManager {
 		
 		Menu menu_2 = new Menu(mntmEdit);
 		mntmEdit.setMenu(menu_2);
+		
+		MenuItem mntmRescanKeys = new MenuItem(menu_2, SWT.NONE);
+		mntmRescanKeys.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				model.scanFolder();
+			}
+		});
+		mntmRescanKeys.setText("Rescan Keys");
 		
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setLayout(new FillLayout(SWT.HORIZONTAL));

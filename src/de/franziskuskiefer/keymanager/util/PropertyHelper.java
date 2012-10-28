@@ -1,4 +1,4 @@
-package de.franziskuskiefer.pgp.keymanager.util;
+package de.franziskuskiefer.keymanager.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;

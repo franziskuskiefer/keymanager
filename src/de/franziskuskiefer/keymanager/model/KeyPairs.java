@@ -1,4 +1,4 @@
-package de.franziskuskiefer.pgp.keymanager.model;
+package de.franziskuskiefer.keymanager.model;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +11,8 @@ public class KeyPairs {
 
 	@XmlElement
 	private List<KeyPair> keyPairs = new LinkedList<KeyPair>();
+	@XmlElement
+	private String keyRing = "";
 	
 	public List<KeyPair> getKeyPairs() {
 		return keyPairs;

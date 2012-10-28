@@ -3,37 +3,26 @@
     <keyPairs>
         <website>google.com</website>
         <keyID>0xABCDEF</keyID>
-        <privateKeyFile>blub</privateKeyFile>
-        <publicKeyFile>bla</publicKeyFile>
     </keyPairs>
     <keyPairs>
         <website>facebook.com</website>
         <keyID>0x7654JH</keyID>
-        <privateKeyFile>asdf</privateKeyFile>
-        <publicKeyFile>swergser</publicKeyFile>
     </keyPairs>
     <keyPairs>
         <website>sdf.com</website>
         <keyID>0x87654EF</keyID>
-        <privateKeyFile></privateKeyFile>
-        <publicKeyFile></publicKeyFile>
     </keyPairs>
     <keyPairs>
         <website>zrhb.com</website>
         <keyID>0x123EF</keyID>
-        <privateKeyFile></privateKeyFile>
-        <publicKeyFile></publicKeyFile>
     </keyPairs>
     <keyPairs>
         <website>poektg.com</website>
         <keyID>0xABGWEEF</keyID>
-        <privateKeyFile></privateKeyFile>
-        <publicKeyFile></publicKeyFile>
     </keyPairs>
     <keyPairs>
         <website>ijrv.com</website>
         <keyID>0xF3FAA202</keyID>
-        <privateKeyFile>agre</privateKeyFile>
-        <publicKeyFile>aergaer</publicKeyFile>
     </keyPairs>
+    <keyRing>/home/franziskus/workspace/PGP\ KeyManager/test/keys/keyring</keyRing>
 </keyPairs>

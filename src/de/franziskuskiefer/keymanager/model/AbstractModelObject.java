@@ -1,4 +1,4 @@
-package de.franziskuskiefer.pgp.keymanager.model;
+package de.franziskuskiefer.keymanager.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
