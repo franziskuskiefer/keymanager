@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class KeyPairs {
 
 	private List<KeyPair> keyPairs = new ArrayList<KeyPair>();
-	private String keyRing = "";
 	
 	@XmlElement(name="keyPairs")
 	public List<KeyPair> getKeyPairs() {
@@ -27,12 +26,4 @@ public class KeyPairs {
 		
 	}
 	
-	@XmlElement(name="keyRing")
-	public String getKeyRing() {
-		return keyRing;
-	}
-	public void setKeyRing(String kr) {
-		this.keyRing = kr;
-	}
-
 }

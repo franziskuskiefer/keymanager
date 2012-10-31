@@ -2,8 +2,6 @@ package de.franziskuskiefer.keymanager.model;
 
 import static de.franziskuskiefer.keymanager.util.PropertyHelper.prop;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -25,17 +23,25 @@ public class Model implements Constants {
 	private String config;
 	private JAXBContext context;
 	private KeyManagerBackend keyManager;
+	private String keystoreFile;
 
 	public Model() {
+		// initialise key manager
+		keyManager = new KeyManagerBackend();
+		
 		// read config
 		config = prop.getProperty(CONFIG_FILE);
 		if (config != null){
 			loadConfig();
 		} else {
 			setKeys(new KeyPairs());
+			// TODO: what should I do here? Wizard?
+			String defaultConfigFile = "/home/franziskus/workspace/KeyManager/test/keys/.newKeystore.xml";
+			String defaultKeyStoreFile = "/home/franziskus/workspace/KeyManager/test/keys/newKeystore.ks";
+			prop.setProperty(CONFIG_FILE, defaultConfigFile);
+			config = defaultConfigFile;
+			keystoreFile = defaultKeyStoreFile;
 		}
-		
-		keyManager = new KeyManagerBackend();
 	}
 
 	private void loadConfig() {
@@ -51,9 +57,9 @@ public class Model implements Constants {
 
 	public void saveKeys(){
 		try {
+			context = JAXBContext.newInstance(KeyPairs.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal(getKeys(), System.out);
 
 			Writer w = null;
 			try {
@@ -79,19 +85,26 @@ public class Model implements Constants {
 	}
 
 	public void importKeystore(String keystoreFile, String pwd) {
+		
+		// get the file names clear at first
+//		File file = new File(keystoreFile);
+//		if (file.exists()){
+//			String keyStoreFileName = file.getName();
+//			String keyStorePath = (new File(keystoreFile)).getParent();
+//			String configFileName = "."+keyStoreFileName.substring(0, keyStoreFileName.lastIndexOf("."))+".xml";
+//			String absolutConfigFileName = keyStorePath+File.separator+configFileName;
+			
 		// check if config exists --- otherwise throw an error (can't work without it)
-		String keyStoreFileName = (new File(keystoreFile)).getName();
-		String keyStorePath = (new File(keystoreFile)).getParent();
-		String configFileName = "."+keyStoreFileName.substring(0, keyStoreFileName.lastIndexOf("."))+".xml";
-		String absolutConfigFileName = keyStorePath+File.separator+configFileName;
-		if (absolutConfigFileName != null && (new File(absolutConfigFileName)).exists()){
+		if (config != null && (new File(config)).exists()){
 			// store config property
-			prop.setProperty(CONFIG_FILE, absolutConfigFileName);
-			config = absolutConfigFileName;
 			loadConfig();
-		} else {
+			this.keystoreFile = keystoreFile;		
+		} else if (keystoreFile != null && (new File(keystoreFile)).exists()) {
 			throw new RuntimeException("Sorry, no config for "+keystoreFile+". Cant't work without it!");
 		}
+//		}
+		// load keystore
+		keyManager.openKeyStore(keystoreFile, pwd);
 	}
 	
 	public KeyPairs getKeys() {
@@ -103,7 +116,19 @@ public class Model implements Constants {
 	}
 
 	public void addKey(String website, String email) {
-		keyManager.generateKey("MeineID", email);
+		keyManager.generateKey(website+":"+email, email);
+		getKeys().getKeyPairs().add(new KeyPair(website, email));
+		saveKeys();
+	}
+
+	public void importKeystore(String password) {
+		importKeystore(keystoreFile, password);
+	}
+
+	public boolean hasKeyStore() {
+		if (config != null)
+			return true;
+		return false;
 	}
 
 }

@@ -2,12 +2,8 @@ package de.franziskuskiefer.keymanager;
 
 import java.io.File;
 
-import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -25,19 +21,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import de.franziskuskiefer.keymanager.model.KeyPair;
 import de.franziskuskiefer.keymanager.model.KeyPairs;
 import de.franziskuskiefer.keymanager.model.Model;
 
 public class KeyManager {
 
-	protected Shell shell;
-	private String keystoreFile;
+	protected Shell shlKeyManager;
 	private Table table;
 	private TableViewer tableViewer;
 	private TableColumn tblclmnWebsite;
 	private Model model;
-	private String password;
 
 	private KeyPairs keys;
 
@@ -71,12 +64,22 @@ public class KeyManager {
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
-		shell.open();
-		shell.layout();
-		while (!shell.isDisposed()) {
+		optionalLogin();
+		shlKeyManager.open();
+		shlKeyManager.layout();
+		while (!shlKeyManager.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
+		}
+	}
+
+	private void optionalLogin() {
+		if(model.hasKeyStore()){
+			PasswordDialogue pwdDialog = new PasswordDialogue(shlKeyManager);
+			String password = pwdDialog.open();
+			model.importKeystore(password);
+			tableViewer.refresh();
 		}
 	}
 
@@ -84,19 +87,19 @@ public class KeyManager {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
-		shell = new Shell();
-		shell.setSize(400, 597);
-		shell.setText("SWT Application");
-		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
-		Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		shlKeyManager = new Shell();
+		shlKeyManager.setSize(400, 597);
+		shlKeyManager.setText("Key Manager");
+		shlKeyManager.setLayout(new FillLayout(SWT.HORIZONTAL));
+		Monitor primary = shlKeyManager.getDisplay().getPrimaryMonitor();
 	    Rectangle bounds = primary.getBounds();
-	    Rectangle rect = shell.getBounds();
+	    Rectangle rect = shlKeyManager.getBounds();
 	    int x = bounds.x + (bounds.width - rect.width) / 2;
 	    int y = bounds.y + (bounds.height - rect.height) / 2;
-	    shell.setLocation(x, y);
+	    shlKeyManager.setLocation(x, y);
 		
-		Menu menu = new Menu(shell, SWT.BAR);
-		shell.setMenuBar(menu);
+		Menu menu = new Menu(shlKeyManager, SWT.BAR);
+		shlKeyManager.setMenuBar(menu);
 		
 		MenuItem mntmFile = new MenuItem(menu, SWT.CASCADE);
 		mntmFile.setText("File");
@@ -109,11 +112,11 @@ public class KeyManager {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog dialog = new FileDialog(shell);
-				keystoreFile = dialog.open();
+				FileDialog dialog = new FileDialog(shlKeyManager);
+				String keystoreFile = dialog.open();
 				if (keystoreFile != null && (new File(keystoreFile)).exists()){
-					PasswordDialogue pwdDialog = new PasswordDialogue(shell);
-					password = pwdDialog.open();
+					PasswordDialogue pwdDialog = new PasswordDialogue(shlKeyManager);
+					String password = pwdDialog.open();
 					model.importKeystore(keystoreFile, password);
 					tableViewer.refresh();
 				}
@@ -130,7 +133,7 @@ public class KeyManager {
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shell.dispose();
+				shlKeyManager.dispose();
 			}
 		});
 		mntmExit.setText("Exit");
@@ -145,9 +148,9 @@ public class KeyManager {
 		mntmCreateKey.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String website = "TolleHP";
-				String email = "meine@mail.de";
-				model.addKey(website, email);
+				CreateKey pwdDialog = new CreateKey(shlKeyManager);
+				String[] keyProperties = pwdDialog.open();
+				model.addKey(keyProperties[0], keyProperties[1]);
 				tableViewer.refresh();
 			}
 		});
@@ -163,7 +166,7 @@ public class KeyManager {
 		});
 		mntmRescanKeys.setText("Rescan Keys");
 		
-		Composite composite = new Composite(shell, SWT.NONE);
+		Composite composite = new Composite(shlKeyManager, SWT.NONE);
 		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		tableViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
