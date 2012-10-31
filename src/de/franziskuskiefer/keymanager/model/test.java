@@ -6,12 +6,12 @@ import javax.xml.bind.Marshaller;
 public class test {
 
 	public static void main(String[] args) throws Exception {
-		KeyPairs keys = new KeyPairs();
-		keys = new Model().getKeys();
-		JAXBContext context = JAXBContext.newInstance(KeyPairs.class);
-	    Marshaller m = context.createMarshaller();
-	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	    m.marshal(keys, System.out);
+//		KeyPairs keys = new KeyPairs();
+//		keys = new Model().getKeys();
+//		JAXBContext context = JAXBContext.newInstance(KeyPairs.class);
+//	    Marshaller m = context.createMarshaller();
+//	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//	    m.marshal(keys, System.out);
 
 //	    Writer w = null;
 //	    try {

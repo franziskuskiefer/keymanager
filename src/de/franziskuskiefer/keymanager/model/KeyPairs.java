@@ -1,35 +1,38 @@
 package de.franziskuskiefer.keymanager.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.PROPERTY)
 public class KeyPairs {
 
-	@XmlElement
-	private List<KeyPair> keyPairs = new LinkedList<KeyPair>();
-	@XmlElement
+	private List<KeyPair> keyPairs = new ArrayList<KeyPair>();
 	private String keyRing = "";
 	
+	@XmlElement(name="keyPairs")
 	public List<KeyPair> getKeyPairs() {
 		return keyPairs;
 	}
+	
+	public void setKeyPairs(List<KeyPair> kp) {
+		this.keyPairs = kp;
+	}
 
 	public KeyPairs() {
-		// XXX: Testing: fill list
-		/*
-		keyPairs.add(new KeyPair("google.com", "0xABCDEF", "bla", "blub"));
-		keyPairs.add(new KeyPair("lakhsd.com", "0x7654JH", "swergser", "asdf"));
-		keyPairs.add(new KeyPair("sdf.com", "0x87654EF", "", ""));
-		keyPairs.add(new KeyPair("zrhb.com", "0x123EF", "", ""));
-		keyPairs.add(new KeyPair("poektg.com", "0xABGWEEF", "", ""));
-		keyPairs.add(new KeyPair("ijrv.com", "0xF3FAA202", "aergaer", "agre"));
-		*/
+		
 	}
 	
-	
-	
+	@XmlElement(name="keyRing")
+	public String getKeyRing() {
+		return keyRing;
+	}
+	public void setKeyRing(String kr) {
+		this.keyRing = kr;
+	}
+
 }

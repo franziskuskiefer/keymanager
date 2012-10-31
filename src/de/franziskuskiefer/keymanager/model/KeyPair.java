@@ -1,21 +1,38 @@
 package de.franziskuskiefer.keymanager.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class KeyPair extends AbstractModelObject{
+public class KeyPair {
 
 	@XmlElement
 	private String website = "";
 	private String mail = "";
+	
+	/**
+	 * Listener stuff for TableViewer
+	 */
+	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+	}
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.removePropertyChangeListener(listener);
+	}
 
+	
+	
 	public KeyPair() {
+		
 	}
 
 	public KeyPair(String hp, String m) {
-		website = hp;
-		mail = m;
+		setMail(m);
+		setWebiste(hp);
 	}
 	
 	public String getWebsite() {
@@ -23,9 +40,7 @@ public class KeyPair extends AbstractModelObject{
 	}
 	
 	public void setWebiste(String hp) {
-		String oldValue = website;
-		website = hp;
-		firePropertyChange("website", oldValue, website);
+		propertyChangeSupport.firePropertyChange("website", this.website, this.website = hp);
 	}
 	
 	public String getMail() {
@@ -33,9 +48,7 @@ public class KeyPair extends AbstractModelObject{
 	}
 
 	public void setMail(String m) {
-		String oldValue = mail;
-		mail = m;
-		firePropertyChange("mail", oldValue, mail);
+		propertyChangeSupport.firePropertyChange("mail", this.mail, this.mail = m);
 	}
 
 }

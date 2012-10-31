@@ -1,25 +1,26 @@
 package de.franziskuskiefer.keymanager;
 
+import java.io.File;
+
 import org.eclipse.core.databinding.Binding;
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
-import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -29,16 +30,16 @@ import de.franziskuskiefer.keymanager.model.KeyPairs;
 import de.franziskuskiefer.keymanager.model.Model;
 
 public class KeyManager {
-	private Binding website;
-	private DataBindingContext m_bindingContext;
 
 	protected Shell shell;
-	private String chosenDirectory;
+	private String keystoreFile;
 	private Table table;
-	private KeyPairs keys;
 	private TableViewer tableViewer;
 	private TableColumn tblclmnWebsite;
 	private Model model;
+	private String password;
+
+	private KeyPairs keys;
 
 	/**
 	 * Launch the application.
@@ -87,6 +88,12 @@ public class KeyManager {
 		shell.setSize(400, 597);
 		shell.setText("SWT Application");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
+		Monitor primary = shell.getDisplay().getPrimaryMonitor();
+	    Rectangle bounds = primary.getBounds();
+	    Rectangle rect = shell.getBounds();
+	    int x = bounds.x + (bounds.width - rect.width) / 2;
+	    int y = bounds.y + (bounds.height - rect.height) / 2;
+	    shell.setLocation(x, y);
 		
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -102,8 +109,14 @@ public class KeyManager {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(shell);
-				chosenDirectory = dialog.open();
+				FileDialog dialog = new FileDialog(shell);
+				keystoreFile = dialog.open();
+				if (keystoreFile != null && (new File(keystoreFile)).exists()){
+					PasswordDialogue pwdDialog = new PasswordDialogue(shell);
+					password = pwdDialog.open();
+					model.importKeystore(keystoreFile, password);
+					tableViewer.refresh();
+				}
 			}
 		});
 		mntmOpen.setText("Open");
@@ -117,7 +130,7 @@ public class KeyManager {
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Close me...");
+				shell.dispose();
 			}
 		});
 		mntmExit.setText("Exit");
@@ -128,11 +141,24 @@ public class KeyManager {
 		Menu menu_2 = new Menu(mntmEdit);
 		mntmEdit.setMenu(menu_2);
 		
+		MenuItem mntmCreateKey = new MenuItem(menu_2, SWT.NONE);
+		mntmCreateKey.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String website = "TolleHP";
+				String email = "meine@mail.de";
+				model.addKey(website, email);
+				tableViewer.refresh();
+			}
+		});
+		mntmCreateKey.setText("Create Key");
+		
 		MenuItem mntmRescanKeys = new MenuItem(menu_2, SWT.NONE);
 		mntmRescanKeys.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				model.scanFolder();
+//				FIXME: model.rescanKeystore();
+				tableViewer.refresh();
 			}
 		});
 		mntmRescanKeys.setText("Rescan Keys");
@@ -146,31 +172,19 @@ public class KeyManager {
 		table.setHeaderVisible(true);
 		
 		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		tblclmnWebsite = tableViewerColumn.getColumn();
-		tblclmnWebsite.setWidth(276);
-		tblclmnWebsite.setText("Website");
+		TableColumn column1 = tableViewerColumn.getColumn();
+		column1.setWidth(276);
+		column1.setText("Website");
 		
 		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnMail = tableViewerColumn_2.getColumn();
 		tblclmnMail.setWidth(100);
 		tblclmnMail.setText("Mail");
 		
-		m_bindingContext = initDataBindings();
-	}
-	protected DataBindingContext initDataBindings() {
-		DataBindingContext bindingContext = new DataBindingContext();
-		//
-		ObservableSetContentProvider setContentProvider = new ObservableSetContentProvider();
-		tableViewer.setContentProvider(setContentProvider);
-		//
-		IObservableMap[] observeMaps = PojoObservables.observeMaps(
-					setContentProvider.getKnownElements(), KeyPair.class,
-					new String[] { "website", "mail"});
-		tableViewer.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
-		//
-		WritableSet writableSet = new WritableSet(keys.getKeyPairs(), KeyPair.class);
-		tableViewer.setInput(writableSet);
-		//
-		return bindingContext;
-	}
+		// for the data binding
+		tableViewer.setContentProvider(new ModelContentProvider());
+		tableViewer.setLabelProvider(new ModelLabelProvider());
+		// Get the content for the viewer, setInput will call getElements in the contentProvider
+		tableViewer.setInput(model);
+ 	}
 }
